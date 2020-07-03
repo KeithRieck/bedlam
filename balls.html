@@ -1,0 +1,17 @@
+<html>
+<head>
+    <title>Demo</title>
+</head>
+<body>
+
+<canvas id="canvas" width="640" height="480"></canvas>
+
+<script type="module">
+    import * as game from "./build/balls.js";
+    window.game = game;
+    var app = new window.game.BallsGame();
+    app.start()
+</script>
+
+</body>
+</html>

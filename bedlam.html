@@ -1,0 +1,22 @@
+<html>
+<head>
+    <title>Demo 2</title>
+</head>
+<body>
+
+<canvas id="canvas" width="640" height="480"></canvas>
+
+<script type="module">
+    import * as game from "./build/balls.js";
+    window.game = game;
+    var app = new window.game.BallsGame1();
+    app.start()
+</script>
+
+<div style="display:none;">
+    <img id="dukeImage" src="assets/duke.gif"/>
+    <img id="backgroundImage" src="assets/Seurat_1200_900.jpg"/>
+</div>
+
+</body>
+</html>
