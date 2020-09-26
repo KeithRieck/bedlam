@@ -1,10 +1,25 @@
 COMPILE_FLAGS=-b -m -n -ds
 DEPLOY_DIR=${HOME}/Sites/bedlam
 
-build:    build/balls.js build/phaser_platformer.js
+build:    build/balls.js build/boids.js build/phaser_platformer.js build/demo.js     build/q1.js
+
+build/q1.js: q1.py
+	transcrypt $(COMPILE_FLAGS) q1.py
+	mkdir -p build
+	cp -r __target__/* build/
 
 build/balls.js: balls.py
 	transcrypt $(COMPILE_FLAGS) balls.py
+	mkdir -p build
+	cp -r __target__/* build/
+
+build/boids.js: boids.py
+	transcrypt $(COMPILE_FLAGS) boids.py
+	mkdir -p build
+	cp -r __target__/* build/
+
+build/demo.js: demo.py
+	transcrypt $(COMPILE_FLAGS) demo.py
 	mkdir -p build
 	cp -r __target__/* build/
 

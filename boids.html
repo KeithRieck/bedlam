@@ -1,0 +1,17 @@
+<html>
+<head>
+    <title>Boids</title>
+</head>
+<body>
+
+<canvas id="canvas" width="640" height="480"></canvas>
+
+<script type="module">
+    import * as game from "./build/boids.js";
+    window.game = game;
+    var app = new window.game.BoidsGame();
+    app.start()
+</script>
+
+</body>
+</html>
