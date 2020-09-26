@@ -14,7 +14,7 @@ document = window = Math = Date = console = 0  # Prevent complaints by optional 
 
 class Ball(Sprite):
 
-    def __init__(self, game, speed=40, radius=10):
+    def __init__(self, game, speed=40, radius=10, color='black'):
         Sprite.__init__(self, game, radius, radius)
         self.x = self.game.canvas.width * Math.random()
         self.y = self.game.canvas.height * Math.random()
@@ -22,6 +22,7 @@ class Ball(Sprite):
         self.dx = speed * Math.cos(angle)
         self.dy = speed * Math.sin(angle)
         self.radius = radius
+        self.color = color
 
     def update(self, delta_time):
         self.x = self.x + self.dx * delta_time / 1000.0
@@ -40,8 +41,10 @@ class Ball(Sprite):
             self.dy = self.dy * -1.0
 
     def draw(self, ctx):
+        Sprite.draw(self, ctx)
         ctx.save()
         ctx.globalCompositeOperation = 'source-over'
+        ctx.strokeStyle = self.color
         ctx.lineWidth = 3
         ctx.beginPath()
         ctx.arc(self.x, self.y, self.radius, 0, 2 * Math.PI)
