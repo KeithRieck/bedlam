@@ -7,9 +7,11 @@
 <canvas id="canvas" width="640" height="480"></canvas>
 
 <script type="module">
-    import * as game from "./build/boids.js";
+    import * as game from "./build/q1.js";
     window.game = game;
+    const urlParams = new URLSearchParams(window.location.search);
     var app = new window.game.BoidsGame();
+    app.set_debug(urlParams.get('debug'))
     app.start()
 </script>
 
