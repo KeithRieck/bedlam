@@ -1,5 +1,6 @@
 from bedlam import Button
 from bedlam import Game
+from bedlam import GameTask
 from bedlam import ImageSprite
 from bedlam import Scene
 from bedlam import Sprite
@@ -83,6 +84,7 @@ class Duke(ImageSprite):
 class DemoScene(Scene):
     def __init__(self, game, name, num_balls=8):
         Scene.__init__(self, game, name)
+        self.my_sound = game.load_audio('mySound')
         for n in range(num_balls):
             self.append(Ball(self.game, 100, 10))
 
@@ -93,7 +95,45 @@ class DemoScene(Scene):
 
     def ouch(self):
         console.log("Ouch!!!")
+        self.my_sound.play()
         self.button2.enabled = not self.button2.enabled
+        console.log("TEST: button function :")
+        t = 4
+        def ouch_closure():
+            console.log("TEST: closure: " + t + " seconds later ")
+        lambda_task_1 = lambda: console.log("TEST: lambda, two seconds in the future: ")
+        self.schedule(lambda_task_1, 2000)
+        self.schedule(self.ouch_func, 3000)
+        self.schedule(ouch_closure, 4000)
+        self.schedule(OuchTask1(self.game, self, 5000, 4))
+        self.schedule(OuchTask2(self.game, self, 6000, 2, "Hello from the ouch function"))
+
+    def ouch_func(self, scene=None):
+        console.log("TEST: function, scheduled a few seconds in the future: " + scene)
+
+
+class OuchTask1(GameTask):
+    def __init__(self, game, gameobject, time_delay=0, repeat_count=0):
+        GameTask.__init__(self, game, gameobject, None, time_delay, repeat_count)
+        self.count = 0
+
+    def run(self):
+        self.count = self.count + 1
+        new_fill_color = 'blue' if self.count % 2 == 1 else 'yellow'
+        self.gameobject.button1.fillStyle = new_fill_color
+        console.log("TEST: simple custom GameTask " + self.count)
+
+
+class OuchTask2(GameTask):
+    def __init__(self, game, gameobject, time_delay=0, repeat_count=0, msg="HELLO"):
+        GameTask.__init__(self, game, gameobject, None, time_delay, repeat_count)
+        self.count = 0
+        def run_func():
+            self.count = self.count + 1
+            new_fill_color = 'red' if self.count % 2 == 1 else 'white'
+            self.gameobject.button2.fillStyle = new_fill_color
+            console.log("TEST: custom GameTask with a closure inside, : " + self.count + " : " + msg)
+        self.func = run_func
 
 
 class DemoScene1(DemoScene):
