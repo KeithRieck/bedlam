@@ -1,4 +1,4 @@
-// Transcrypt'ed from Python, 2020-09-26 15:25:51
+// Transcrypt'ed from Python, 2020-12-13 18:02:25
 import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __proxy__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 import * as phaser from './io.phaser.js';
 var __name__ = '__main__';
@@ -20,7 +20,7 @@ export var ScoreLabel =  __class__ ('ScoreLabel', [object], {
 			var score = 0;
 		};
 		self.scene = scene;
-		self.text = self.scene.add.text (x, y, '', dict ({'fontSize': '32px', 'fill': '#000'}));
+		self.text = self.scene.add.text (x, y, '', dict ([['fontSize', '32px'], ['fill', '#000']]));
 		self.score = score;
 		self.update ();
 	});},
@@ -69,7 +69,7 @@ export var HelloWorldScene =  __class__ ('HelloWorldScene', [phaser.Scene], {
 		self.load.image (GROUND_KEY, 'assets/platform.png');
 		self.load.image (STAR_KEY, 'assets/star.png');
 		self.load.image (BOMB_KEY, 'assets/bomb.png');
-		self.load.spritesheet (DUDE_KEY, 'assets/dude.png', dict ({'frameWidth': 32, 'frameHeight': 48}));
+		self.load.spritesheet (DUDE_KEY, 'assets/dude.png', dict ([['frameWidth', 32], ['frameHeight', 48]]));
 	});},
 	get create () {return __get__ (this, function (self) {
 		self.add.image (400, 300, SKY_KEY);
@@ -97,13 +97,13 @@ export var HelloWorldScene =  __class__ ('HelloWorldScene', [phaser.Scene], {
 		var player = self.physics.add.sprite (100, 405, DUDE_KEY);
 		player.setBounce (0.2);
 		player.setCollideWorldBounds (true);
-		self.anims.create (dict ({'key': 'left', 'frames': self.anims.generateFrameNumbers (DUDE_KEY, dict ({'start': 0, 'end': 3})), 'frameRate': 10, 'repeat': -(1)}));
-		self.anims.create (dict ({'key': 'turn', 'frames': [dict ({'key': DUDE_KEY, 'frame': 4})], 'frameRate': 20}));
-		self.anims.create (dict ({'key': 'right', 'frames': self.anims.generateFrameNumbers (DUDE_KEY, dict ({'start': 5, 'end': 8})), 'frameRate': 10, 'repeat': -(1)}));
+		self.anims.create (dict ([['key', 'left'], ['frames', self.anims.generateFrameNumbers (DUDE_KEY, dict ([['start', 0], ['end', 3]]))], ['frameRate', 10], ['repeat', -(1)]]));
+		self.anims.create (dict ([['key', 'turn'], ['frames', [dict ([['key', DUDE_KEY], ['frame', 4]])]], ['frameRate', 20]]));
+		self.anims.create (dict ([['key', 'right'], ['frames', self.anims.generateFrameNumbers (DUDE_KEY, dict ([['start', 5], ['end', 8]]))], ['frameRate', 10], ['repeat', -(1)]]));
 		return player;
 	});},
 	get create_stars () {return __get__ (this, function (self) {
-		var stars = self.physics.add.group (dict ({'key': STAR_KEY, 'repeat': 11, 'setXY': dict ({'x': 12, 'y': 0, 'stepX': 70})}));
+		var stars = self.physics.add.group (dict ([['key', STAR_KEY], ['repeat', 11], ['setXY', dict ([['x', 12], ['y', 0], ['stepX', 70]])]]));
 		for (var child of stars.children.entries) {
 			child.setBounceY (Phaser.Math.FloatBetween (0.4, 0.8));
 		}
@@ -146,7 +146,7 @@ export var HelloWorldScene =  __class__ ('HelloWorldScene', [phaser.Scene], {
 		}
 	});}
 });
-export var config = dict ({'type': Phaser.AUTO, 'width': 800, 'height': 600, 'physics': dict ({'default': 'arcade', 'arcade': dict ({'gravity': dict ({'y': 300}), 'debug': false})}), 'scene': [HelloWorldScene]});
+export var config = dict ([['type', Phaser.AUTO], ['width', 800], ['height', 600], ['physics', dict ([['default', 'arcade'], ['arcade', dict ([['gravity', dict ([['y', 300]])], ['debug', false]])]])], ['scene', [HelloWorldScene]]]);
 export var game = new Phaser.Game (config);
 
 //# sourceMappingURL=phaser_platformer.map

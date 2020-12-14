@@ -1,8 +1,9 @@
-// Transcrypt'ed from Python, 2020-09-26 15:25:52
+// Transcrypt'ed from Python, 2020-12-13 18:02:26
 import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __proxy__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 import {Sprite} from './bedlam.js';
 import {Scene} from './bedlam.js';
 import {ImageSprite} from './bedlam.js';
+import {GameTask} from './bedlam.js';
 import {Game} from './bedlam.js';
 import {Button} from './bedlam.js';
 var __name__ = '__main__';
@@ -99,6 +100,7 @@ export var DemoScene =  __class__ ('DemoScene', [Scene], {
 			var num_balls = 8;
 		};
 		Scene.__init__ (self, game, py_name);
+		self.my_sound = game.load_audio ('mySound');
 		for (var n = 0; n < num_balls; n++) {
 			self.append (Ball (self.game, 100, 10));
 		}
@@ -108,7 +110,69 @@ export var DemoScene =  __class__ ('DemoScene', [Scene], {
 	});},
 	get ouch () {return __get__ (this, function (self) {
 		console.log ('Ouch!!!');
+		self.my_sound.play ();
 		self.button2.enabled = !(self.button2.enabled);
+		console.log ('TEST: button function :');
+		var t = 4;
+		var ouch_closure = function () {
+			console.log (('TEST: closure: ' + t) + ' seconds later ');
+		};
+		var lambda_task_1 = (function __lambda__ () {
+			return console.log ('TEST: lambda, two seconds in the future: ');
+		});
+		self.schedule (lambda_task_1, 2000);
+		self.schedule (self.ouch_func, 3000);
+		self.schedule (ouch_closure, 4000);
+		self.schedule (OuchTask1 (self.game, self, 5000, 4));
+		self.schedule (OuchTask2 (self.game, self, 6000, 2, 'Hello from the ouch function'));
+	});},
+	get ouch_func () {return __get__ (this, function (self, scene) {
+		if (typeof scene == 'undefined' || (scene != null && scene.hasOwnProperty ("__kwargtrans__"))) {;
+			var scene = null;
+		};
+		console.log ('TEST: function, scheduled a few seconds in the future: ' + scene);
+	});}
+});
+export var OuchTask1 =  __class__ ('OuchTask1', [GameTask], {
+	__module__: __name__,
+	get __init__ () {return __get__ (this, function (self, game, gameobject, time_delay, repeat_count) {
+		if (typeof time_delay == 'undefined' || (time_delay != null && time_delay.hasOwnProperty ("__kwargtrans__"))) {;
+			var time_delay = 0;
+		};
+		if (typeof repeat_count == 'undefined' || (repeat_count != null && repeat_count.hasOwnProperty ("__kwargtrans__"))) {;
+			var repeat_count = 0;
+		};
+		GameTask.__init__ (self, game, gameobject, null, time_delay, repeat_count);
+		self.count = 0;
+	});},
+	get run () {return __get__ (this, function (self) {
+		self.count = self.count + 1;
+		var new_fill_color = (__mod__ (self.count, 2) == 1 ? 'blue' : 'yellow');
+		self.gameobject.button1.fillStyle = new_fill_color;
+		console.log ('TEST: simple custom GameTask ' + self.count);
+	});}
+});
+export var OuchTask2 =  __class__ ('OuchTask2', [GameTask], {
+	__module__: __name__,
+	get __init__ () {return __get__ (this, function (self, game, gameobject, time_delay, repeat_count, msg) {
+		if (typeof time_delay == 'undefined' || (time_delay != null && time_delay.hasOwnProperty ("__kwargtrans__"))) {;
+			var time_delay = 0;
+		};
+		if (typeof repeat_count == 'undefined' || (repeat_count != null && repeat_count.hasOwnProperty ("__kwargtrans__"))) {;
+			var repeat_count = 0;
+		};
+		if (typeof msg == 'undefined' || (msg != null && msg.hasOwnProperty ("__kwargtrans__"))) {;
+			var msg = 'HELLO';
+		};
+		GameTask.__init__ (self, game, gameobject, null, time_delay, repeat_count);
+		self.count = 0;
+		var run_func = function () {
+			self.count = self.count + 1;
+			var new_fill_color = (__mod__ (self.count, 2) == 1 ? 'red' : 'white');
+			self.gameobject.button2.fillStyle = new_fill_color;
+			console.log ((('TEST: custom GameTask with a closure inside, : ' + self.count) + ' : ') + msg);
+		};
+		self.func = run_func;
 	});}
 });
 export var DemoScene1 =  __class__ ('DemoScene1', [DemoScene], {
