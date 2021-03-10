@@ -1,3 +1,4 @@
+from bedlam import Animation
 from bedlam import Button
 from bedlam import Game
 from bedlam import GameTask
@@ -13,7 +14,7 @@ document = window = Math = Date = console = 0  # Prevent complaints by optional 
 # __pragma__('noalias', 'clear')
 
 
-class Ball(Sprite):
+class BallSprite(Sprite):
 
     def __init__(self, game, speed=40, radius=10):
         Sprite.__init__(self, game, radius, radius)
@@ -50,21 +51,24 @@ class Ball(Sprite):
         ctx.restore()
 
 
-class Duke(ImageSprite):
+class DukeSprite(ImageSprite):
     def __init__(self, game, speed=20):
         duke_image = game.load_image('dukeImage')
-        ImageSprite.__init__(self, game, 50, 50, duke_image)
+        ImageSprite.__init__(self, game, duke_image, 50, 50)
         self.x = 100
         self.y = 100
-        angle = 2 * Math.PI * Math.random()
-        self.dx = speed * Math.cos(angle)
-        self.dy = speed * Math.sin(angle)
+        d_angle = 2 * Math.PI * Math.random()
+        self.dx = speed * Math.cos(d_angle)
+        self.dy = speed * Math.sin(d_angle)
+        self.angle = 0
         self.radius = self.width / 2
         self.originX = self.radius
         self.originY = self.radius
+        self.game_image.originX = self.originX
+        self.game_image.originY = self.originY
+        self.game_image.angle = self.angle
 
-    def update(self, delta_time):
-        self.angle = self.angle + 0.4
+    def _move(self, delta_time):
         self.x = self.x + self.dx * delta_time / 1000.0
         if self.x < self.radius:
             self.x = self.radius
@@ -80,13 +84,30 @@ class Duke(ImageSprite):
             self.y = self.game.canvas.height - self.radius
             self.dy = self.dy * -1.0
 
+    def update(self, delta_time):
+        ImageSprite.update(self, delta_time)
+        self.angle = self.angle + 0.4
+        self._move(delta_time)
+
+
+class ScrollerSprite(DukeSprite):
+    def __init__(self, game, animation, speed=20):
+        DukeSprite.__init__(self, game, speed)
+        self.width = 60
+        self.height = 60
+        self.radius = self.width / 2
+        animation.originX = self.radius
+        animation.originY = self.radius
+        self.animation = animation
+        self.animation.start()
+
 
 class DemoScene(Scene):
     def __init__(self, game, name, num_balls=8):
         Scene.__init__(self, game, name)
         self.my_sound = game.load_audio('mySound')
         for n in range(num_balls):
-            self.append(Ball(self.game, 100, 10))
+            self.append(BallSprite(self.game, 100, 10))
 
     def handle_mousedown(self, event):
         Scene.handle_mousedown(self, event)
@@ -162,14 +183,17 @@ class DemoScene2(DemoScene):
 class DemoScene3(DemoScene):
     def __init__(self, game, name, num_balls=8):
         DemoScene.__init__(self, game, name, num_balls)
-        self.append(Duke(self.game, 50))
+        scroller_spritesheet = game.load_spritesheet('assets/scroller.json', 'scrollerImage')
+        animation = Animation(self.game, scroller_spritesheet.frames())
+        animation.name = 'scroller'
+        self.append(DukeSprite(self.game, 50))
+        self.append(ScrollerSprite(self.game, animation, 50))
         self.background_image = self.game.load_image('backgroundImage')
+        self.background_image.global_composition_operation = 'copy'
 
     def _clear_screen(self, ctx):
-        ctx.save()
-        ctx.globalCompositeOperation = 'copy'
-        ctx.drawImage(self.background_image, 0, 0)
-        ctx.restore()
+        DemoScene._clear_screen(self, ctx)
+        self.background_image.draw(ctx)
 
 
 class BallsGame(Game):
