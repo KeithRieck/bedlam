@@ -41,8 +41,10 @@ deploy: build LICENSE
 	cp -r build $(DEPLOY_DIR)
 	cp -r assets $(DEPLOY_DIR)
 	cp LICENSE $(DEPLOY_DIR)
-	cp etc/* $(DEPLOY_DIR)
-
+	cp *.png $(DEPLOY_DIR)
+	cp style.css $(DEPLOY_DIR)
+	cp *.json $(DEPLOY_DIR)
+	cp *.js $(DEPLOY_DIR)
 
 setup:
 	virtualenv venv --python=${PYTHON_HOME}/bin/python3
