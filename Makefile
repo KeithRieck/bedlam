@@ -2,7 +2,7 @@ COMPILE_FLAGS=-b -m -n
 PYTHON_HOME=/usr/local/opt/python@3.8
 DEPLOY_DIR=${HOME}/Sites/bedlam
 
-build:     build/balls.js build/boids.js build/platformer_phaser.js build/demo.js build/snake.js
+build:     build/balls.js build/boids.js build/platformer_phaser.js build/demo.js build/snake.js build/starfield.js
 
 build/balls.js: balls.py
 	transcrypt $(COMPILE_FLAGS) balls.py
@@ -21,6 +21,11 @@ build/demo.js: demo.py
 
 build/snake.js: snake.py
 	transcrypt $(COMPILE_FLAGS) snake.py
+	mkdir -p build
+	cp -r __target__/* build/
+
+build/starfield.js:
+	transcrypt $(COMPILE_FLAGS) starfield.py
 	mkdir -p build
 	cp -r __target__/* build/
 

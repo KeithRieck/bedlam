@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Starfield</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Zooming through stars">
+    <link rel="stylesheet" href="style.css">
+    <meta name="theme-color" content="white"/>
+</head>
+<body class="fullscreen">
+
+<div class="container">
+    <canvas id="canvas" width="640" height="480"></canvas>
+</div>
+
+<script type="module">
+    import * as game from "./build/starfield.js";
+    window.game = game;
+    var app = new window.game.MainGame();
+    app.start()
+</script>
+
+</body>
+</html>
