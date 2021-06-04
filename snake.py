@@ -14,6 +14,7 @@ CELL_SIZE = 28
 BOARD_MARGIN_LEFT = 50
 BOARD_MARGIN_TOP = 5
 SNAKE_TIME_STEP = 300
+SNAKE_TIME_STEP_MIN = 150
 GAME_BEGIN = "GAME_BEGIN"
 GAME_RUNNING = "GAME_RUNNING"
 GAME_OVER = "GAME_OVER"
@@ -84,12 +85,14 @@ class Snake(GameObject):
                or (d1 == UP and d2 == DOWN) or (d1 == DOWN and d2 == UP)
 
     def update(self, delta_time: float):
+        global SNAKE_TIME_STEP
         GameObject.update(self, delta_time)
         if self.scene.mode == GAME_RUNNING:
             self.time_used = self.time_used + delta_time
             while self.time_used > SNAKE_TIME_STEP:
                 self.time_used = self.time_used - SNAKE_TIME_STEP
                 self.move_at_cell()
+                SNAKE_TIME_STEP = Math.max(SNAKE_TIME_STEP_MIN, SNAKE_TIME_STEP-1)
             for snakesegment in self.segments:
                 snakesegment.update(delta_time)
 

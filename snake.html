@@ -4,11 +4,16 @@
     <meta charset="UTF-8"/>
     <title>Snake</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="128x128" href="snake_apple-touch-icon.png">
     <meta name="description" content="Snake game written in Python and compiled to JavaScript.">
+    <link rel="stylesheet" href="style.css">
+    <meta name="theme-color" content="white"/>
 </head>
-<body>
+<body class="fullscreen">
 
+<div class="container">
 <canvas id="canvas" width="640" height="480"></canvas>
+</div>
 
 <script type="module">
     import * as game from "./build/snake.js";
