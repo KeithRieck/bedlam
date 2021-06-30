@@ -111,8 +111,8 @@ class DemoScene(Scene):
 
     def handle_mousedown(self, event):
         Scene.handle_mousedown(self, event)
-        # console.log('mousedown: ' + event.x + ',' + event.y)
-        # self.button1.label = '' + event.x + ',' + event.y
+        # console.log('mousedown: ' + event.mouseX + ',' + event.mouseY)
+        # self.button1.label = '' + event.mouseX + ',' + event.mouseY
 
     def ouch(self):
         console.log("Ouch!!!")
@@ -235,8 +235,8 @@ class DemoScene4(DemoScene):
 
     def handle_mousemove(self, event):
         Scene.handle_mousemove(self, event)
-        self.mouse_x = event.x
-        self.mouse_y = event.y
+        self.mouse_x = event.mouseX
+        self.mouse_y = event.mouseY
         self.offsetX = event.offsetX
         self.offsetY = event.offsetY
         self.clientX = event.clientX
@@ -345,12 +345,6 @@ class DemoScene4(DemoScene):
 class DemoGame(Game):
     def __init__(self, loop_time=20):
         Game.__init__(self, 'Balls', loop_time)
-        self.append(DemoScene(self, 'SCENE', 128))
-
-
-class DemoGame1(Game):
-    def __init__(self, loop_time=20):
-        Game.__init__(self, 'Balls', loop_time)
 
         self.scene1 = DemoScene1(self, 'SCENE', 8)
         btn1 = self.scene1.append(Button(self, 50, 300, 130, 30, 'Switch'))
@@ -372,7 +366,7 @@ class DemoGame1(Game):
         btn4.callback = self.switch_scene
         self.append(self.scene4)
 
-        self.currentScene = self.scene4
+        self.currentScene = self.scene1
 
     def switch_scene(self):
         console.log("Switch!!!")
