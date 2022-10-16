@@ -11,5 +11,23 @@ This repository contains random projects I wrote while building up my Python ski
 * Bedlam function demo: https://keithrieck.github.io/bedlam/demo.html
 * The [Phaser Sample Game](https://phaser.io/tutorials/making-your-first-phaser-3-game) rewritten in Python: https://keithrieck.github.io/bedlam/platformer_phaser.html
 
+## TODO:
+* Side scroller
+* Platformer
+* Space War / Asteroids
+* RPG 
+* Rogue-like
+* Farming Game
+* Tower Defense
+* Blackjack / Card Game
+* Yahtzee
+* Slot machine
+* Driving / Racing game
+* Tank shooter game
+* Real time strategy game
+* Simple 3-D game : Battlezone
+* Tetris
+* Brickout
+
 
 

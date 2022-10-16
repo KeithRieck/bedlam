@@ -1,6 +1,6 @@
 # Bedlam is a trivial game framework.
 # It is based, very loosely, on Phaser (see https://phaser.io).
-# Copyright (c) 2020,2021 Keith Rieck
+# Copyright (c) 2020,2021,2022 Keith Rieck
 
 
 # __pragma__('skip')
