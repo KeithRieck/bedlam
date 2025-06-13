@@ -639,17 +639,20 @@ class Game:
     def _remove_gamepad(self, event):
         self.gamepads.pop(event.gamepad.index)
     
-    def get_gamepad(self, index=None):
-        # TODO: handle navigator.webkitGetGamepads if it is defined
-        gp = navigator.getGamepads()[0]
-        if gp is not None:
+    def get_gamepad(self, index: int = None):
+        gp = None
+        if navigator.webkitGetGamepads is not js_undefined:
+            gp = navigator.webkitGetGamepads()[0]
+        else:
+            gp = navigator.getGamepads()[0]
+        if (gp is not js_undefined) and (gp is not None):
             if not gp.connected:
                 return None
             if gp.connected and (index is None or gp.index == index):
                 return gp
         return None
     
-    def handle_gamepad(self, index=None):
+    def handle_gamepad(self, index: int = None):
         if self.currentScene is not None:
             gp = self.get_gamepad(index)
             if gp is not None:

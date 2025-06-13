@@ -311,7 +311,7 @@ class DemoScene4(DemoScene):
         Scene.draw(self, ctx)
         ctx.save()
         ctx.globalCompositeOperation = 'source-over'
-        # ctx.beginPath()
+
         ctx.font = self.font
         ctx.fillStyle = 'black'
         ctx.strokeStyle = 'black'
@@ -400,6 +400,7 @@ class DemoScene4(DemoScene):
         ctx.lineTo(300 + lh, 300)
         ctx.closePath()
         ctx.stroke()
+
         ctx.restore()
 
 
