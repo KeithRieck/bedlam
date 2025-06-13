@@ -382,8 +382,7 @@ class DemoScene4(DemoScene):
         if gp is not None:
             msg = 'Gamepad: {} : '.format(gp.id)
             for i in range(len(gp.buttons)):
-                b = gp.buttons[i]
-                if b.pressed:
+                if self.is_button_pressed(gp, i):
                     msg = msg + i + " "
             ctx.fillText(msg, 20, yy)
             yy = yy + self.line_height

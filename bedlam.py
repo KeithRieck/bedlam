@@ -6,7 +6,7 @@
 # __pragma__('skip')
 from typing import Optional, List, Dict
 
-document = window = Math = Date = console = XMLHttpRequest = JSON = 0  # Prevent complaints by optional static checker
+document = window = Math = Date = console = XMLHttpRequest = JSON = navigator = 0  # Prevent complaints by optional static checker
 
 
 # __pragma__('noskip')
@@ -505,6 +505,12 @@ class Scene(GameObject):
     def handle_gamepad(self, gp):
         pass
 
+    def is_button_pressed(self, gp, i) -> bool:
+        b = gp.buttons[i]
+        if isinstance(b, (int, float)):
+            return b == 1
+        return b.pressed or b.touched or b.value > 0
+
     def append(self, gameobject):
         self.children.append(gameobject)
         gameobject.scene = self
@@ -634,7 +640,11 @@ class Game:
         self.gamepads.pop(event.gamepad.index)
     
     def get_gamepad(self, index=None):
-        for gp in self.gamepads.values():
+        # TODO: handle navigator.webkitGetGamepads if it is defined
+        gp = navigator.getGamepads()[0]
+        if gp is not None:
+            if not gp.connected:
+                return None
             if gp.connected and (index is None or gp.index == index):
                 return gp
         return None
