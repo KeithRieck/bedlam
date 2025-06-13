@@ -1,4 +1,4 @@
-// Transcrypt'ed from Python, 2021-06-29 21:20:10
+// Transcrypt'ed from Python, 2025-06-12 21:11:26
 import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __proxy__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 import {Sprite} from './bedlam.js';
 import {Scene} from './bedlam.js';
@@ -130,6 +130,10 @@ export var DemoScene =  __class__ ('DemoScene', [Scene], {
 			self.append (BallSprite (self.game, 100, 10));
 		}
 	});},
+	get handle_gamepad () {return __get__ (this, function (self, gp) {
+		Scene.handle_gamepad (self, gp);
+		console.log ('Gamepad:');
+	});},
 	get handle_mousedown () {return __get__ (this, function (self, event) {
 		Scene.handle_mousedown (self, event);
 	});},
@@ -137,13 +141,13 @@ export var DemoScene =  __class__ ('DemoScene', [Scene], {
 		console.log ('Ouch!!!');
 		self.my_sound.play ();
 		self.button2.enabled = !(self.button2.enabled);
-		console.log ('TEST: button function :');
+		console.log ('TEST0: button function :');
 		var t = 4;
 		var ouch_closure = function () {
-			console.log ('TEST: closure: {} seconds later '.format (t));
+			console.log ('TEST1: closure: {} seconds later '.format (t));
 		};
 		var lambda_task_1 = (function __lambda__ () {
-			return console.log ('TEST: lambda, two seconds in the future: ');
+			return console.log ('TEST2: lambda, two seconds in the future: ');
 		});
 		self.schedule (lambda_task_1, 2000);
 		self.schedule (self.ouch_func, 3000);
@@ -155,7 +159,7 @@ export var DemoScene =  __class__ ('DemoScene', [Scene], {
 		if (typeof scene == 'undefined' || (scene != null && scene.hasOwnProperty ("__kwargtrans__"))) {;
 			var scene = null;
 		};
-		console.log ('TEST: function, scheduled a few seconds in the future: ' + scene);
+		console.log ('TEST3: function, scheduled a few seconds in the future: ' + scene);
 	});}
 });
 export var OuchTask1 =  __class__ ('OuchTask1', [GameTask], {
@@ -174,7 +178,7 @@ export var OuchTask1 =  __class__ ('OuchTask1', [GameTask], {
 		self.count = self.count + 1;
 		var new_fill_color = (__mod__ (self.count, 2) == 1 ? 'blue' : 'yellow');
 		self.gameobject.button1.fillStyle = new_fill_color;
-		console.log ('TEST: simple custom GameTask ' + self.count);
+		console.log ('TEST4: simple custom GameTask ' + self.count);
 	});}
 });
 export var OuchTask2 =  __class__ ('OuchTask2', [GameTask], {
@@ -195,7 +199,7 @@ export var OuchTask2 =  __class__ ('OuchTask2', [GameTask], {
 			self.count = self.count + 1;
 			var new_fill_color = (__mod__ (self.count, 2) == 1 ? 'red' : 'white');
 			self.gameobject.button2.fillStyle = new_fill_color;
-			console.log ('TEST: custom GameTask with a closure inside, : {}} : {}'.format (self.count, msg));
+			console.log ('TEST5: custom GameTask with a closure inside, : {}} : {}'.format (self.count, msg));
 		};
 		self.func = run_func;
 	});}
@@ -363,6 +367,20 @@ export var DemoScene4 =  __class__ ('DemoScene4', [DemoScene], {
 		var yy = yy + self.line_height;
 		var yy = yy + self.line_height;
 		ctx.fillText (self.win_app_version, 20, yy);
+		var yy = yy + self.line_height;
+		var yy = yy + self.line_height;
+		var gp = self.game.get_gamepad ();
+		if (gp !== null) {
+			var msg = 'Gamepad: {} : '.format (gp.id);
+			for (var i = 0; i < len (gp.buttons); i++) {
+				if (self.is_button_pressed (gp, i)) {
+					var msg = (msg + i) + ' ';
+				}
+			}
+			ctx.fillText (msg, 20, yy);
+			var yy = yy + self.line_height;
+			var yy = yy + self.line_height;
+		}
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = 'blue';
 		ctx.rect (0, 0, self.game.canvas.width, self.game.canvas.height);

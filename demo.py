@@ -15,7 +15,9 @@ document = window = Math = Date = console = 0  # Prevent complaints by optional 
 
 
 class BallSprite(Sprite):
-
+    """
+    This simple Sprite draws a small circle and bounces it across the screen.
+    """
     def __init__(self, game, speed=40, radius=10):
         Sprite.__init__(self, game, radius, radius)
         self.x = self.game.canvas.width * Math.random()
@@ -52,6 +54,10 @@ class BallSprite(Sprite):
 
 
 class DukeSprite(ImageSprite):
+    """
+    This Sprite bounces an image around the screen.
+    It also rotates the image as it moves round.
+    """
     def __init__(self, game, speed=20):
         duke_image = game.load_image('dukeImage')
         ImageSprite.__init__(self, game, duke_image, 50, 50)
@@ -91,6 +97,11 @@ class DukeSprite(ImageSprite):
 
 
 class ScrollerSprite(DukeSprite):
+    """
+    This Sprite bounces an image around the screen.
+    It appears to rotate, but it actually cycles through
+    different images in a SpriteSheet.
+    """
     def __init__(self, game, animation, speed=20):
         DukeSprite.__init__(self, game, speed)
         self.width = 60
@@ -103,11 +114,19 @@ class ScrollerSprite(DukeSprite):
 
 
 class DemoScene(Scene):
+    """
+    This base Scene is a parent class for all the other demo scenes.
+    It also contains the 'ouch' function that demonstrate GameTasks.
+    """
     def __init__(self, game, name, num_balls=8):
         Scene.__init__(self, game, name)
         self.my_sound = game.load_audio('mySound')
         for n in range(num_balls):
             self.append(BallSprite(self.game, 100, 10))
+    
+    def handle_gamepad(self, gp):
+        Scene.handle_gamepad(self, gp)
+        console.log("Gamepad:")
 
     def handle_mousedown(self, event):
         Scene.handle_mousedown(self, event)
@@ -115,16 +134,22 @@ class DemoScene(Scene):
         # self.button1.label = '' + event.mouseX + ',' + event.mouseY
 
     def ouch(self):
+        """
+        This function demonstrates scheduling GameTask objects within this Scene.
+        Five different tasks will be scheduled, with delay times spread out over
+        several seconds.  The last two tasks are set to repeat multiple times.
+        """
         console.log("Ouch!!!")
         self.my_sound.play()
         self.button2.enabled = not self.button2.enabled
-        console.log("TEST: button function :")
+        console.log("TEST0: button function :")
         t = 4
 
         def ouch_closure():
-            console.log("TEST: closure: {} seconds later ".format(t))
+            console.log("TEST1: closure: {} seconds later ".format(t))
 
-        lambda_task_1 = lambda: console.log("TEST: lambda, two seconds in the future: ")
+        lambda_task_1 = lambda: console.log("TEST2: lambda, two seconds in the future: ")
+
         self.schedule(lambda_task_1, 2000)
         self.schedule(self.ouch_func, 3000)
         self.schedule(ouch_closure, 4000)
@@ -132,10 +157,14 @@ class DemoScene(Scene):
         self.schedule(OuchTask2(self.game, self, 6000, 2, "Hello from the ouch function"))
 
     def ouch_func(self, scene=None):
-        console.log("TEST: function, scheduled a few seconds in the future: " + scene)
+        console.log("TEST3: function, scheduled a few seconds in the future: " + scene)
 
 
 class OuchTask1(GameTask):
+    """
+    This task toggles the color of button1 between blue and yellow.
+    It is implemented by overriding the 'run' method.
+    """
     def __init__(self, game, gameobject, time_delay=0, repeat_count=0):
         GameTask.__init__(self, game, gameobject, None, time_delay, repeat_count)
         self.count = 0
@@ -144,10 +173,14 @@ class OuchTask1(GameTask):
         self.count = self.count + 1
         new_fill_color = 'blue' if self.count % 2 == 1 else 'yellow'
         self.gameobject.button1.fillStyle = new_fill_color
-        console.log("TEST: simple custom GameTask " + self.count)
+        console.log("TEST4: simple custom GameTask " + self.count)
 
 
 class OuchTask2(GameTask):
+    """
+    This task toggles the color of button2 between red and white.
+    It is implemented by assigning the 'func' property to an internal function.
+    """
     def __init__(self, game, gameobject, time_delay=0, repeat_count=0, msg="HELLO"):
         GameTask.__init__(self, game, gameobject, None, time_delay, repeat_count)
         self.count = 0
@@ -156,12 +189,17 @@ class OuchTask2(GameTask):
             self.count = self.count + 1
             new_fill_color = 'red' if self.count % 2 == 1 else 'white'
             self.gameobject.button2.fillStyle = new_fill_color
-            console.log("TEST: custom GameTask with a closure inside, : {}} : {}".format(self.count, msg))
+            console.log("TEST5: custom GameTask with a closure inside, : {}} : {}".format(self.count, msg))
 
         self.func = run_func
 
 
 class DemoScene1(DemoScene):
+    """
+    The first demo scene bounces some BallSprites on a white background.
+    It contains some buttons to execute the 'ouch' function for running
+    GameTasks.
+    """
     def __init__(self, game, name, num_balls=8):
         DemoScene.__init__(self, game, name, num_balls)
         self.button1 = self.append(Button(self.game, 50, 360, 130, 30, 'Test'))
@@ -173,6 +211,9 @@ class DemoScene1(DemoScene):
 
 
 class DemoScene2(DemoScene):
+    """
+    The second demo scene bounces more BallSprites on a gray background.
+    """
     def __init__(self, game, name, num_balls=8):
         DemoScene.__init__(self, game, name, num_balls)
 
@@ -185,6 +226,10 @@ class DemoScene2(DemoScene):
 
 
 class DemoScene3(DemoScene):
+    """
+    The third demo scene bounces some BallSprites and also a couple 
+    of animated ImageSprites.
+    """
     def __init__(self, game, name, num_balls=8):
         DemoScene.__init__(self, game, name, num_balls)
         scroller_spritesheet = game.load_spritesheet('assets/scroller.json', 'scrollerImage')
@@ -201,6 +246,10 @@ class DemoScene3(DemoScene):
 
 
 class DemoScene4(DemoScene):
+    """
+    The fourth scene demonstrates handlers, while also managing
+    some bouncing sprites.
+    """
     def __init__(self, game, name, num_balls=4):
         DemoScene.__init__(self, game, name, num_balls)
         self.font = '12pt sans-serif'
@@ -326,6 +375,18 @@ class DemoScene4(DemoScene):
         yy = yy + self.line_height
 
         ctx.fillText(self.win_app_version, 20, yy)
+        yy = yy + self.line_height
+        yy = yy + self.line_height
+        
+        gp = self.game.get_gamepad()
+        if gp is not None:
+            msg = 'Gamepad: {} : '.format(gp.id)
+            for i in range(len(gp.buttons)):
+                if self.is_button_pressed(gp, i):
+                    msg = msg + i + " "
+            ctx.fillText(msg, 20, yy)
+            yy = yy + self.line_height
+            yy = yy + self.line_height
 
         ctx.lineWidth = 1
         ctx.strokeStyle = 'blue'
@@ -343,6 +404,10 @@ class DemoScene4(DemoScene):
 
 
 class DemoGame(Game):
+    """
+    This is the parent Game class.  It manages all the Scenes.
+    Every game contains one Game object and one or more Scenes.
+    """
     def __init__(self, loop_time=20):
         Game.__init__(self, 'Balls', loop_time)
 
