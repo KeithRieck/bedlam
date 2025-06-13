@@ -123,6 +123,10 @@ class DemoScene(Scene):
         self.my_sound = game.load_audio('mySound')
         for n in range(num_balls):
             self.append(BallSprite(self.game, 100, 10))
+    
+    def handle_gamepad(self, gp):
+        Scene.handle_gamepad(self, gp)
+        console.log("Gamepad:")
 
     def handle_mousedown(self, event):
         Scene.handle_mousedown(self, event)
@@ -371,6 +375,19 @@ class DemoScene4(DemoScene):
         yy = yy + self.line_height
 
         ctx.fillText(self.win_app_version, 20, yy)
+        yy = yy + self.line_height
+        yy = yy + self.line_height
+        
+        gp = self.game.get_gamepad()
+        if gp is not None:
+            msg = 'Gamepad: {} : '.format(gp.id)
+            for i in range(len(gp.buttons)):
+                b = gp.buttons[i]
+                if b.pressed:
+                    msg = msg + i + " "
+            ctx.fillText(msg, 20, yy)
+            yy = yy + self.line_height
+            yy = yy + self.line_height
 
         ctx.lineWidth = 1
         ctx.strokeStyle = 'blue'

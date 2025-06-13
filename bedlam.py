@@ -1,6 +1,6 @@
 # Bedlam is a trivial game framework.
 # It is based, very loosely, on Phaser (see https://phaser.io).
-# Copyright (c) 2020,2021,2022 Keith Rieck
+# Copyright (c) 2020,2021,2022,2025 Keith Rieck
 
 
 # __pragma__('skip')
@@ -502,6 +502,9 @@ class Scene(GameObject):
     def handle_keydown(self, event):
         pass
 
+    def handle_gamepad(self, gp):
+        pass
+
     def append(self, gameobject):
         self.children.append(gameobject)
         gameobject.scene = self
@@ -559,9 +562,10 @@ class Game:
         else:
             self.canvasFrame = None
             self.canvas = None
-        self.scenes: Dict[str, Scene] = {}
+        self.scenes: Dict[str, Scene] = dict()
         self.currentScene: Optional[Scene] = None
         self._loop_time = loop_time
+        self.gamepads: Dict[int, object] = dict()
 
     def __get_context(self):
         return self.canvas.getContext('2d')
@@ -622,6 +626,24 @@ class Game:
     def handle_keydown(self, event):
         if self.currentScene is not None:
             self.currentScene.handle_keydown(event)
+    
+    def _add_gamepad(self, event):
+        self.gamepads[event.gamepad.index] = event.gamepad
+
+    def _remove_gamepad(self, event):
+        self.gamepads.pop(event.gamepad.index)
+    
+    def get_gamepad(self, index=None):
+        for gp in self.gamepads.values():
+            if gp.connected and (index is None or gp.index == index):
+                return gp
+        return None
+    
+    def handle_gamepad(self, index=None):
+        if self.currentScene is not None:
+            gp = self.get_gamepad(index)
+            if gp is not None:
+                self.currentScene.handle_gamepad(gp)
 
     def append(self, scene):
         self.scenes[scene.name] = scene
@@ -668,6 +690,8 @@ class Game:
         window.addEventListener('touchstart', self.handle_mousedown, False)
         window.addEventListener('touchend', self.handle_mouseup, False)
         window.addEventListener('touchmove', self.handle_mousemove, False)
+        window.addEventListener('gamepadconnected', self._add_gamepad, False)
+        window.addEventListener('gamepaddisconnected', self._remove_gamepad, False)
 
     def __game_loop(self):
         ctx = self.__get_context()
@@ -676,3 +700,4 @@ class Game:
         self.update(delta_time)
         self.draw(ctx)
         self._prev_time = self.get_time()
+        self.handle_gamepad()
