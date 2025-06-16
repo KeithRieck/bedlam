@@ -311,7 +311,7 @@ class DemoScene4(DemoScene):
         Scene.draw(self, ctx)
         ctx.save()
         ctx.globalCompositeOperation = 'source-over'
-
+        # ctx.beginPath()
         ctx.font = self.font
         ctx.fillStyle = 'black'
         ctx.strokeStyle = 'black'
@@ -380,12 +380,24 @@ class DemoScene4(DemoScene):
         
         gp = self.game.get_gamepad()
         if gp is not None:
-            msg = 'Gamepad: {} : '.format(gp.id)
+            gp_name = gp.id.split('(')
+            msg = 'Gamepad: {} : '.format(gp_name[0])
             for i in range(len(gp.buttons)):
                 if self.is_button_pressed(gp, i):
                     msg = msg + i + " "
+            if self.get_axis_value(gp, 0) < -0.5:
+                msg = msg + "L "
+            elif self.get_axis_value(gp, 0) > 0.5:
+                msg = msg + "R "
+            if self.get_axis_value(gp, 1) < -0.5:
+                msg = msg + "U "
+            elif self.get_axis_value(gp, 1) > 0.5:
+                msg = msg + "D "
             ctx.fillText(msg, 20, yy)
             yy = yy + self.line_height
+            if len(gp_name) > 1:
+                msg2 = '       ({}'.format(gp_name[1])
+                ctx.fillText(msg2, 20, yy)
             yy = yy + self.line_height
 
         ctx.lineWidth = 1
@@ -400,7 +412,6 @@ class DemoScene4(DemoScene):
         ctx.lineTo(300 + lh, 300)
         ctx.closePath()
         ctx.stroke()
-
         ctx.restore()
 
 
