@@ -385,6 +385,14 @@ class DemoScene4(DemoScene):
             for i in range(len(gp.buttons)):
                 if self.is_button_pressed(gp, i):
                     msg = msg + i + " "
+            if self.get_axis_value(gp, 0) < -0.5:
+                msg = msg + "L "
+            elif self.get_axis_value(gp, 0) > 0.5:
+                msg = msg + "R "
+            if self.get_axis_value(gp, 1) < -0.5:
+                msg = msg + "U "
+            elif self.get_axis_value(gp, 1) > 0.5:
+                msg = msg + "D "
             ctx.fillText(msg, 20, yy)
             yy = yy + self.line_height
             if len(gp_name) > 1:
