@@ -703,7 +703,6 @@ class Game:
         window.addEventListener('mouseup', self.handle_mouseup, False)
         window.addEventListener('mousemove', self.handle_mousemove, False)
         window.addEventListener('keydown', self.handle_keydown, False)
-        window.addEventListener('touchstart', self.handle_mousedown, False)
         window.addEventListener('pointerdown', self.handle_mousedown, False)
         window.addEventListener('touchend', self.handle_mouseup, False)
         window.addEventListener('touchmove', self.handle_mousemove, False)
