@@ -1,10 +1,11 @@
-// Transcrypt'ed from Python, 2025-06-16 13:21:54
+// Transcrypt'ed from Python, 2026-09-18 12:48:14
+import {py_copy as _copy} from './copy.js';
 var __name__ = 'org.transcrypt.__runtime__';
 export var __envir__ = {};
 __envir__.interpreter_name = 'python';
 __envir__.transpiler_name = 'transcrypt';
 __envir__.executor_name = __envir__.transpiler_name;
-__envir__.transpiler_version = '3.7.16';
+__envir__.transpiler_version = '3.9.5';
 
 export function __nest__ (headObject, tailNames, value) {
     var current = headObject;
@@ -38,15 +39,14 @@ export function __init__ (module) {
     }
     return module.__all__;
 };
-export var __proxy__ = false;
-export function __get__ (self, func, quotedFuncName) {
-    if (self) {
-        if (self.hasOwnProperty ('__class__') || typeof self == 'string' || self instanceof String) {
+export function __get__ (aThis, func, quotedFuncName) {
+    if (aThis) {
+        if (aThis.hasOwnProperty ('__class__') || typeof aThis == 'string' || aThis instanceof String) {
             if (quotedFuncName) {
-                Object.defineProperty (self, quotedFuncName, {
+                Object.defineProperty (aThis, quotedFuncName, {
                     value: function () {
                         var args = [] .slice.apply (arguments);
-                        return func.apply (null, [self] .concat (args));
+                        return func.apply (null, [aThis] .concat (args));
                     },
                     writable: true,
                     enumerable: true,
@@ -55,7 +55,7 @@ export function __get__ (self, func, quotedFuncName) {
             }
             return function () {
                 var args = [] .slice.apply (arguments);
-                return func.apply (null, [self] .concat (args));
+                return func.apply (null, [aThis.__proxy__ ? aThis.__proxy__ : aThis] .concat (args));
             };
         }
         else {
@@ -66,21 +66,21 @@ export function __get__ (self, func, quotedFuncName) {
         return func;
     }
 };
-export function __getcm__ (self, func, quotedFuncName) {
-    if (self.hasOwnProperty ('__class__')) {
+export function __getcm__ (aThis, func, quotedFuncName) {
+    if (aThis.hasOwnProperty ('__class__')) {
         return function () {
             var args = [] .slice.apply (arguments);
-            return func.apply (null, [self.__class__] .concat (args));
+            return func.apply (null, [aThis.__class__] .concat (args));
         };
     }
     else {
         return function () {
             var args = [] .slice.apply (arguments);
-            return func.apply (null, [self] .concat (args));
+            return func.apply (null, [aThis] .concat (args));
         };
     }
 };
-export function __getsm__ (self, func, quotedFuncName) {
+export function __getsm__ (aThis, func, quotedFuncName) {
     return func;
 };
 export var py_metatype = {
@@ -95,6 +95,9 @@ export var py_metatype = {
             var base = bases [index];
             for (var attrib in base) {
                 var descrip = Object.getOwnPropertyDescriptor (base, attrib);
+                if (descrip == null) {
+                    continue;
+                }
                 Object.defineProperty (cls, attrib, descrip);
             }
             for (let symbol of Object.getOwnPropertySymbols (base)) {
@@ -125,7 +128,7 @@ export var object = {
     __new__: function (args) {
         var instance = Object.create (this, {__class__: {value: this, enumerable: true}});
         if ('__getattr__' in this || '__setattr__' in this) {
-            instance = new Proxy (instance, {
+            instance.__proxy__ = new Proxy (instance, {
                 get: function (target, name) {
                     let result = target [name];
                     if (result == undefined) {
@@ -145,6 +148,7 @@ export var object = {
                     return true;
                 }
             })
+			instance = instance.__proxy__
         }
         this.__init__.apply (null, [instance] .concat (args));
         return instance;
@@ -485,11 +489,50 @@ export function chr (charCode) {
 export function ord (aChar) {
     return aChar.charCodeAt (0);
 };
-export function max (nrOrSeq) {
-    return arguments.length == 1 ? Math.max (...nrOrSeq) : Math.max (...arguments);
+function min_max (f_compare, ...args) {
+    let dflt = undefined;
+    function key(x) {return x}
+    if (args.length > 0) {
+        if (args[args.length-1] && args[args.length-1].hasOwnProperty ("__kwargtrans__")) {
+            const kwargs = args[args.length - 1];
+            args = args.slice(0, -1);
+            if (kwargs.hasOwnProperty('py_default')) dflt = kwargs['py_default'];
+            if (kwargs.hasOwnProperty('key')) key = kwargs['key'];
+            if (Object.prototype.toString.call(key) !== '[object Function]') throw TypeError("object is not callable", new Error());
+        }
+    }
+    if (args.length === 0) throw TypeError("expected at least 1 argument, got 0", new Error ());
+    if (args.length > 1 && dflt !== undefined) throw TypeError("Cannot specify a default with multiple positional arguments", new Error ());
+    if (args.length === 1){
+        if (Object.prototype.toString.call(args[0]) !== '[object Array]') throw TypeError("object is not iterable", new Error());
+        args = args[0];
+    }
+    if (args.length === 0){
+        if (dflt === undefined) throw ValueError ("arg is an empty sequence", new Error ());
+        return dflt
+    }
+    return args.reduce((max_val, cur_val) => f_compare(key(cur_val), key(max_val)) ? cur_val : max_val);
+}
+export function max (...args) {
+    return min_max(function (a, b){return a > b}, ...args)
+}
+export function min (...args) {
+    return min_max(function (a, b){return a < b}, ...args)
+}
+export function bin (nbr) {
+    const sign = nbr<0 ? '-' : '';
+    const bin_val = Math.abs(parseInt(nbr)).toString(2);
+    return sign.concat('0b', bin_val);
 };
-export function min (nrOrSeq) {
-    return arguments.length == 1 ? Math.min (...nrOrSeq) : Math.min (...arguments);
+export function oct (nbr) {
+    const sign = nbr<0 ? '-' : '';
+    const oct_val = Math.abs(parseInt(nbr)).toString(8);
+    return sign.concat('0o', oct_val);
+};
+export function hex (nbr) {
+    const sign = nbr<0 ? '-' : '';
+    const hex_val = Math.abs(parseInt(nbr)).toString(16);
+    return sign.concat('0x', hex_val);
 };
 export var abs = Math.abs;
 export function round (number, ndigits) {
@@ -549,20 +592,22 @@ export function py_iter (iterable) {
     result [Symbol.iterator] = function () {return result;};
     return result;
 }
-export function py_next (iterator) {
+export function py_next (iterator, value) {
     try {
         var result = iterator.__next__ ();
     }
     catch (exception) {
         var result = iterator.next ();
         if (result.done) {
+            if(!(value === undefined)) return value
             throw StopIteration (new Error ());
         }
         else {
             return result.value;
         }
     }
-    if (result == undefined) {
+    if (result === undefined) {
+        if(!(value === undefined)) return value
         throw StopIteration (new Error ());
     }
     else {
@@ -572,6 +617,7 @@ export function py_next (iterator) {
 export function __PyIterator__ (iterable) {
     this.iterable = iterable;
     this.index = 0;
+    this.__len__ = function () {return iterable.length};
 }
 __PyIterator__.prototype.__next__ = function() {
     if (this.index < this.iterable.length) {
@@ -663,37 +709,17 @@ export function sum (iterable) {
     }
     return result;
 }
-export function enumerate (iterable) {
-    return zip (range (len (iterable)), iterable);
-}
-export function copy (anObject) {
-    if (anObject == null || typeof anObject == "object") {
-        return anObject;
+function* __enumerate__ (iterable, start=0) {
+    if (start.hasOwnProperty("__kwargtrans__")) {
+        start = start['start'];
     }
-    else {
-        var result = {};
-        for (var attrib in obj) {
-            if (anObject.hasOwnProperty (attrib)) {
-                result [attrib] = anObject [attrib];
-            }
-        }
-        return result;
+    let n = start
+    for (const item of iterable) {
+        yield [n, item]
+        n += 1
     }
 }
-export function deepcopy (anObject) {
-    if (anObject == null || typeof anObject == "object") {
-        return anObject;
-    }
-    else {
-        var result = {};
-        for (var attrib in obj) {
-            if (anObject.hasOwnProperty (attrib)) {
-                result [attrib] = deepcopy (anObject [attrib]);
-            }
-        }
-        return result;
-    }
-}
+export var py_enumerate = __enumerate__;
 export function list (iterable) {
     let instance = iterable ? Array.from (iterable) : [];
     return instance;
@@ -703,44 +729,79 @@ list.__name__ = 'list';
 list.__bases__ = [object];
 Array.prototype.__iter__ = function () {return new __PyIterator__ (this);};
 Array.prototype.__getslice__ = function (start, stop, step) {
+    if (step === null) {
+        step = 1;
+    }
+    if (start === null) {
+        start = (step < 0 ? -1 : 0);
+    }
     if (start < 0) {
-        start = this.length + start;
+        start = Math.max(this.length + start, 0);
+    } else if (start > this.length || (start === this.length && step < 0)) {
+        start = this.length > 0 ? this.length - 1 : 0;
     }
-    if (stop == null) {
+    if (stop === null) {
+        stop = (step < 0 && this.length > 0 ? -1 : this.length);
+    } else if (stop < 0) {
+        stop = Math.max(this.length + stop, (step < 0 && this.length > 0 ? -1 : 0));
+    } else if (stop > this.length) {
         stop = this.length;
     }
-    else if (stop < 0) {
-        stop = this.length + stop;
-    }
-    else if (stop > this.length) {
-        stop = this.length;
-    }
-    if (step == 1) {
+    if (step === 1) {
         return Array.prototype.slice.call(this, start, stop);
     }
     let result = list ([]);
-    for (let index = start; index < stop; index += step) {
-        result.push (this [index]);
+    if (step > 0) {
+        for (let index = start; index < stop; index += step) {
+            result.push (this [index]);
+        }
+    } else if (step < 0) {
+        for (let index = start; index > stop; index += step) {
+            result.push (this [index]);
+        }
+    } else {
+        throw ValueError ("slice step cannot be zero", new Error ());
     }
     return result;
 };
 Array.prototype.__setslice__ = function (start, stop, step, source) {
-    if (start < 0) {
-        start = this.length + start;
+    if (step === null) {
+        step = 1;
     }
-    if (stop == null) {
+    if (start === null) {
+        start = (step < 0 ? -1 : 0);
+    }
+    if (start < 0) {
+        start = Math.max(this.length + start, 0);
+    } else if (start > this.length || (start === this.length && step < 0)) {
+        start = this.length > 0 ? this.length - 1 : 0;
+    }
+    if (stop === null) {
+        stop = (step < 0 && this.length > 0 ? -1 : this.length);
+    } else if (stop < 0) {
+        stop = Math.max(this.length + stop, (step < 0 && this.length > 0 ? -1 : 0));
+    } else if (stop > this.length) {
         stop = this.length;
     }
-    else if (stop < 0) {
-        stop = this.length + stop;
-    }
-    if (step == null) {
-        Array.prototype.splice.apply (this, [start, stop - start] .concat (source));
+    if (step === 1) {
+        Array.prototype.splice.apply (this, [start, stop - start] .concat (Array.from(source)));
     }
     else {
+        const seq_len = Math.ceil((stop - start) / step)
+        if((source.length > 0 || seq_len > 0) && (seq_len !== source.length)){
+            throw ValueError ("attempt to assign sequence of size " + source.length + " to extended slice of size " + seq_len, new Error ());
+        }
         let sourceIndex = 0;
-        for (let targetIndex = start; targetIndex < stop; targetIndex += step) {
-            this [targetIndex] = source [sourceIndex++];
+        if (step > 0) {
+            for (let targetIndex = start; targetIndex < stop; targetIndex += step) {
+                this [targetIndex] = source [sourceIndex++];
+            }
+        } else if (step < 0) {
+            for (let targetIndex = start; targetIndex > stop; targetIndex += step) {
+                this [targetIndex] = source [sourceIndex++];
+            }
+        } else {
+            throw ValueError ("slice step cannot be zero", new Error ());
         }
     }
 };
@@ -768,6 +829,9 @@ Array.prototype.append = function (element) {
 Array.prototype.py_clear = function () {
     this.length = 0;
 };
+Array.prototype.py_copy = function () {
+    return this.slice();
+};
 Array.prototype.extend = function (aList) {
     this.push.apply (this, aList);
 };
@@ -776,8 +840,8 @@ Array.prototype.insert = function (index, element) {
 };
 Array.prototype.remove = function (element) {
     let index = this.indexOf (element);
-    if (index == -1) {
-        throw ValueError ("list.remove(x): x not in list", new Error ());
+    if (index === -1) {
+        throw ValueError("list.remove(x): x not in list", new Error ());
     }
     this.splice (index, 1);
 };
@@ -785,11 +849,18 @@ Array.prototype.index = function (element) {
     return this.indexOf (element);
 };
 Array.prototype.py_pop = function (index) {
-    if (index == undefined) {
+    if(this.length === 0){
+        throw IndexError("pop from empty list", new Error())
+    }
+    if (index === undefined) {
         return this.pop ();
     }
     else {
-        return this.splice (index, 1) [0];
+        const idx = index < 0 ? this.length + index : index
+        if(this[idx] === undefined){
+            throw IndexError("pop index out of range", new Error())
+        }
+        return this.splice (idx, 1) [0];
     }
 };
 Array.prototype.py_sort = function () {
@@ -1050,37 +1121,55 @@ String.prototype.__str__ = function () {
 String.prototype.capitalize = function () {
     return this.charAt (0).toUpperCase () + this.slice (1);
 };
-String.prototype.endswith = function (suffix) {
+String.prototype.endswith = function (suffix, start=0, end) {
+    if (end === undefined) {end = this.length}
+    const str = this.slice(start, end)
     if (suffix instanceof Array) {
         for (var i=0;i<suffix.length;i++) {
-            if (this.slice (-suffix[i].length) == suffix[i])
+            if (str.slice (-suffix[i].length) === suffix[i])
                 return true;
         }
     } else
-        return suffix == '' || this.slice (-suffix.length) == suffix;
+        return suffix === '' || str.slice (-suffix.length) === suffix;
     return false;
 };
 String.prototype.find = function (sub, start) {
     return this.indexOf (sub, start);
 };
 String.prototype.__getslice__ = function (start, stop, step) {
-    if (start < 0) {
-        start = this.length + start;
+    if (step === null) {
+        step = 1;
     }
-    if (stop == null) {
+    if (start === null) {
+        start = (step < 0 ? -1 : 0);
+    }
+    if (start < 0) {
+        start = Math.max(this.length + start, 0);
+    } else if (start > this.length) {
+        start = this.length > 0 ? this.length + (step < 0 ? -1 : 0) : 0;
+    }
+    if (stop === null) {
+        stop = (step < 0 && this.length > 0 ? -1 : this.length);
+    } else if (stop < 0) {
+        stop = Math.max(this.length + stop, (step < 0 && this.length > 0 ? -1 : 0));
+    } else if (stop > this.length) {
         stop = this.length;
     }
-    else if (stop < 0) {
-        stop = this.length + stop;
+    if (step === 1) {
+        return this.substring (start, (start > stop ? start : stop));
     }
-    var result = '';
-    if (step == 1) {
-        result = this.substring (start, stop);
-    }
-    else {
+    let result = '';
+    if (step > 0) {
         for (var index = start; index < stop; index += step) {
             result = result.concat (this.charAt(index));
         }
+    } else if (step < 0) {
+        for (var index = start; index > stop; index += step) {
+            result = result.concat (this.charAt(index));
+        }
+    }
+    else {
+        throw ValueError ("slice step cannot be zero", new Error ());
     }
     return result;
 };
@@ -1139,7 +1228,15 @@ String.prototype.lower = function () {
     return this.toLowerCase ();
 };
 String.prototype.py_replace = function (old, aNew, maxreplace) {
-    return this.split (old, maxreplace) .join (aNew);
+    if (maxreplace === undefined || maxreplace < 0) {
+        return this.split(old).join(aNew);
+    } else if (maxreplace === 0) {
+        return this;
+    } else {
+        const pre = this.split(old, maxreplace).join(aNew);
+        const rest = this.slice(this.split(old, maxreplace).join(old).length + 1)
+        return pre.concat(rest.length>0 ? aNew : '', rest);
+    }
 };
 String.prototype.lstrip = function () {
     return this.replace (/^\s*/g, '');
@@ -1193,16 +1290,30 @@ String.prototype.py_split = function (sep, maxsplit) {
         }
     }
 };
-String.prototype.startswith = function (prefix) {
+String.prototype.splitlines = function (keepends) {
+    if (this.length === 0) {
+        return [];
+    }
+    if (keepends === undefined || keepends === null || keepends === false) {
+        return this.trimEnd().split(/\r?\n|\r|\n/g);
+    }
+    else {
+        return this.split(/(?<=\n)(?=\n)|(?<=[\r\n])(?=[^\r\n])/g);
+    }
+};
+String.prototype.startswith = function (prefix, start=0, end) {
+    if (end === undefined) {end = this.length}
+    const str = this.slice(start, end)
     if (prefix instanceof Array) {
-        for (var i=0;i<prefix.length;i++) {
-            if (this.indexOf (prefix [i]) == 0)
+        for (let i=0;i<prefix.length;i++) {
+            if (str.indexOf (prefix [i]) === 0)
                 return true;
         }
-    } else
-        return this.indexOf (prefix) == 0;
+    } else {
+        return str.indexOf(prefix) === 0;
+    }
     return false;
-};
+}
 String.prototype.strip = function () {
     return this.trim ();
 };
@@ -1248,23 +1359,23 @@ function __clear__ () {
 }
 function __getdefault__ (aKey, aDefault) {
     var result = this [aKey];
-    if (result == undefined) {
+    if (result === undefined) {
         result = this ['py_' + aKey]
     }
-    return result == undefined ? (aDefault == undefined ? null : aDefault) : result;
+    return result === undefined ? (aDefault === undefined ? null : aDefault) : result;
 }
 function __setdefault__ (aKey, aDefault) {
     var result = this [aKey];
-    if (result != undefined) {
+    if (result !== undefined) {
         return result;
     }
-    var val = aDefault == undefined ? null : aDefault;
+    var val = aDefault === undefined ? null : aDefault;
     this [aKey] = val;
     return val;
 }
 function __pop__ (aKey, aDefault) {
     var result = this [aKey];
-    if (result != undefined) {
+    if (result !== undefined) {
         delete this [aKey];
         return result;
     } else {
@@ -1275,11 +1386,12 @@ function __pop__ (aKey, aDefault) {
     return aDefault;
 }
 function __popitem__ () {
-    var aKey = Object.keys (this) [0];
-    if (aKey == null) {
+    const aKeys = Object.keys (this);
+    if (aKeys.length === 0) {
         throw KeyError ("popitem(): dictionary is empty", new Error ());
     }
-    var result = tuple ([aKey, this [aKey]]);
+    const aKey = aKeys[aKeys.length - 1]
+    const result = tuple ([aKey, this [aKey]]);
     delete this [aKey];
     return result;
 }
@@ -1287,6 +1399,27 @@ function __update__ (aDict) {
     for (var aKey in aDict) {
         this [aKey] = aDict [aKey];
     }
+}
+function __copy__ () {
+    let dNew = {};
+    for (let attrib in this) {
+        dNew[attrib] = this[attrib];
+    }
+    return dict(dNew);
+}
+function __fromkeys__ (iterable, defVal) {
+    if(iterable === undefined){
+        throw TypeError("fromkeys expected at least 1 argument, got 0")
+    }
+    if ( !(['[object Array]', '[object String]'].includes(Object.prototype.toString.call(iterable))) ) {
+        throw TypeError("object is not iterable", new Error());
+    }
+    if(defVal === undefined) defVal = null;
+    let dNew = {};
+    for (let idx= 0; idx < iterable.length; idx++) {
+        dNew[iterable[idx]] = defVal;
+    }
+    return dict(dNew);
 }
 function __values__ () {
     var values = [];
@@ -1304,19 +1437,19 @@ function __dsetitem__ (aKey, aValue) {
     this [aKey] = aValue;
 }
 export function dict (objectOrPairs) {
-    var instance = {};
+    let instance = {};
     if (!objectOrPairs || objectOrPairs instanceof Array) {
         if (objectOrPairs) {
-            for (var index = 0; index < objectOrPairs.length; index++) {
-                var pair = objectOrPairs [index];
-                if ( !(pair instanceof Array) || pair.length != 2) {
+            for (let index = 0; index < objectOrPairs.length; index++) {
+                const pair = objectOrPairs [index];
+                if ( !(pair instanceof Array) || pair.length !== 2) {
                     throw ValueError(
                         "dict update sequence element #" + index +
                         " has length " + pair.length +
                         "; 2 is required", new Error());
                 }
-                var key = pair [0];
-                var val = pair [1];
+                const key = pair [0];
+                let val = pair [1];
                 if (!(objectOrPairs instanceof Array) && objectOrPairs instanceof Object) {
                      if (!isinstance (objectOrPairs, dict)) {
                          val = dict (val);
@@ -1328,9 +1461,9 @@ export function dict (objectOrPairs) {
     }
     else {
         if (isinstance (objectOrPairs, dict)) {
-            var aKeys = objectOrPairs.py_keys ();
-            for (var index = 0; index < aKeys.length; index++ ) {
-                var key = aKeys [index];
+            const aKeys = objectOrPairs.py_keys ();
+            for (let index = 0; index < aKeys.length; index++ ) {
+                const key = aKeys [index];
                 instance [key] = objectOrPairs [key];
             }
         } else if (objectOrPairs instanceof Object) {
@@ -1352,13 +1485,16 @@ export function dict (objectOrPairs) {
     __setproperty__ (instance, 'py_pop', {value: __pop__, enumerable: false});
     __setproperty__ (instance, 'py_popitem', {value: __popitem__, enumerable: false});
     __setproperty__ (instance, 'py_update', {value: __update__, enumerable: false});
+    __setproperty__ (instance, 'py_copy', {value: __copy__, enumerable: false});
     __setproperty__ (instance, 'py_values', {value: __values__, enumerable: false});
+    __setproperty__ (instance, 'py_fromkeys', {value: __fromkeys__, enumerable: false});
     __setproperty__ (instance, '__getitem__', {value: __dgetitem__, enumerable: false});
     __setproperty__ (instance, '__setitem__', {value: __dsetitem__, enumerable: false});
     return instance;
 }
 dict.__name__ = 'dict';
 dict.__bases__ = [object];
+dict.py_fromkeys = __fromkeys__
 function __setdoc__ (docString) {
     this.__doc__ = docString;
     return this;
@@ -1771,8 +1907,12 @@ export function __getitem__ (container, key) {
     if (typeof container == 'object' && '__getitem__' in container) {
         return container.__getitem__ (key);
     }
-    else if ((typeof container == 'string' || container instanceof Array) && key < 0) {
-        return container [container.length + key];
+    else if ( ['[object Array]', '[object String]'].includes(Object.prototype.toString.call(container)) ) {
+        const result = container[key < 0 ? container.length + key : key];
+        if (result === undefined) {
+            throw IndexError ("index out of range", new Error());
+        }
+        return result;
     }
     else {
         return container [key];
@@ -1830,10 +1970,13 @@ export var Exception =  __class__ ('Exception', [BaseException], {
 			var args = tuple ();
 		}
 		self.__args__ = args;
-		try {
+		if (kwargs.error != null) {
 			self.stack = kwargs.error.stack;
 		}
-		catch (__except0__) {
+		else if (Error) {
+			self.stack = new Error ().stack;
+		}
+		else {
 			self.stack = 'No stack trace available';
 		}
 	});},
@@ -1931,7 +2074,7 @@ export var DeprecationWarning =  __class__ ('DeprecationWarning', [Warning], {
 export var RuntimeWarning =  __class__ ('RuntimeWarning', [Warning], {
 	__module__: __name__,
 });
-export var __sort__ = function (iterable, key, reverse) {
+export var _sort = function (iterable, key, reverse) {
 	if (typeof key == 'undefined' || (key != null && key.hasOwnProperty ("__kwargtrans__"))) {;
 		var key = null;
 	};
@@ -1969,23 +2112,35 @@ export var __sort__ = function (iterable, key, reverse) {
 			}
 			else {
 			}
-			return (key (a) > key (b) ? 1 : -(1));
+			return (key (a) < key (b) ? -(1) : 1);
 		}));
 	}
 	else {
-		iterable.sort ();
+		iterable.sort ((function __lambda__ (a, b) {
+			if (arguments.length) {
+				var __ilastarg0__ = arguments.length - 1;
+				if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+					var __allkwargs0__ = arguments [__ilastarg0__--];
+					for (var __attrib0__ in __allkwargs0__) {
+						switch (__attrib0__) {
+							case 'a': var a = __allkwargs0__ [__attrib0__]; break;
+							case 'b': var b = __allkwargs0__ [__attrib0__]; break;
+						}
+					}
+				}
+			}
+			else {
+			}
+			return (a < b ? -(1) : 1);
+		}));
 	}
 	if (reverse) {
 		iterable.reverse ();
 	}
 };
-export var sorted = function (iterable, key, reverse) {
-	if (typeof key == 'undefined' || (key != null && key.hasOwnProperty ("__kwargtrans__"))) {;
-		var key = null;
-	};
-	if (typeof reverse == 'undefined' || (reverse != null && reverse.hasOwnProperty ("__kwargtrans__"))) {;
-		var reverse = false;
-	};
+export var sorted = function (iterable) {
+	var key = null;
+	var reverse = false;
 	if (arguments.length) {
 		var __ilastarg0__ = arguments.length - 1;
 		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
@@ -2002,19 +2157,40 @@ export var sorted = function (iterable, key, reverse) {
 	else {
 	}
 	if (py_typeof (iterable) == dict) {
-		var result = copy (iterable.py_keys ());
+		var result = _copy (iterable.py_keys ());
 	}
 	else {
-		var result = copy (iterable);
+		var result = _copy (iterable);
 	}
-	__sort__ (result, key, reverse);
+	_sort (result, key, reverse);
 	return result;
 };
-export var map = function (func, iterable) {
+export var __sort__ = function (iterable) {
+	var key = null;
+	var reverse = false;
+	if (arguments.length) {
+		var __ilastarg0__ = arguments.length - 1;
+		if (arguments [__ilastarg0__] && arguments [__ilastarg0__].hasOwnProperty ("__kwargtrans__")) {
+			var __allkwargs0__ = arguments [__ilastarg0__--];
+			for (var __attrib0__ in __allkwargs0__) {
+				switch (__attrib0__) {
+					case 'iterable': var iterable = __allkwargs0__ [__attrib0__]; break;
+					case 'key': var key = __allkwargs0__ [__attrib0__]; break;
+					case 'reverse': var reverse = __allkwargs0__ [__attrib0__]; break;
+				}
+			}
+		}
+	}
+	else {
+	}
+	_sort (iterable, key, reverse);
+};
+export var map = function (func) {
+	var iterables = tuple ([].slice.apply (arguments).slice (1));
 	return (function () {
 		var __accu0__ = [];
-		for (var item of iterable) {
-			__accu0__.append (func (item));
+		for (var py_items of zip (...iterables)) {
+			__accu0__.append (func (...py_items));
 		}
 		return __accu0__;
 	}) ();
