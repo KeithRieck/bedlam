@@ -705,6 +705,8 @@ class Game:
         window.addEventListener('keydown', self.handle_keydown, False)
         window.addEventListener('touchstart', self.handle_mousedown, False)
         window.addEventListener('pointerdown', self.handle_mousedown, False)
+        window.addEventListener('pointerup', self.handle_mouseup, False)
+        window.addEventListener('pointermove', self.handle_mousemove, False)
         window.addEventListener('touchend', self.handle_mouseup, False)
         window.addEventListener('touchmove', self.handle_mousemove, False)
         window.addEventListener('gamepadconnected', self._add_gamepad, False)
